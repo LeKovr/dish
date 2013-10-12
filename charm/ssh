@@ -1,0 +1,13 @@
+
+# -------------------------------------------------------------------------------
+
+# Disable upstart for ssh
+dpkg-divert --local --rename --add /etc/init/ssh.conf
+
+apt-get install -y curl lsb-release openssh-server
+
+# EXPOSE 22
+add_port 22
+add_boot /etc/init.d/ssh start
+
+

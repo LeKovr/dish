@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Docker image name to base yours on
+BASE_IMAGE=ubuntu
+
+# Docker image version to use
+BASE_TAG=12.10
+
+# Author field of the generated docker images
+MAINTAINER="alex <lekovr@gmail.com>"
+
+# Prefix of image authors's tag
+TAGPREFIX=lekovr
+
+# Public keys for connect to container via ssh
+USER_PUB_KEYS=~/.ssh/authorized_keys
+
+# DNS server
+# DNS=192.168.1.1
+
+# Mount current dir to dis path
+APP_ROOT=/home/app
+
+# Build process temp files directory inside dish folder
+TMP_DIR=tmp
+
+# Command to run when container started
+CONT_CMD=/bin/bash
+

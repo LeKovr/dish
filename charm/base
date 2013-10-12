@@ -1,0 +1,13 @@
+
+# -------------------------------------------------------------------------------
+# https://www.google.ru/search?client=ubuntu&channel=fs&q=Strider&ie=utf-8&oe=utf-8&gws_rd=cr&ei=S3RUUtPLCo324QSp3oGQCA
+
+# Disallow shell questions
+export DEBIAN_FRONTEND=noninteractive
+
+# Hack for initctl
+# See: https://github.com/dotcloud/docker/issues/1024
+dpkg-divert --local --rename --add /sbin/initctl
+ln -s /bin/true /sbin/initctl
+
+sed -i.bak 's/main$/main universe/' /etc/apt/sources.list

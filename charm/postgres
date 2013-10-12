@@ -1,0 +1,41 @@
+#!/bin/bash
+# -------------------------------------------------------------------------------
+# Postgresql - stage1 (cached)
+# http://docs.docker.io/en/latest/examples/postgresql_service/
+
+V=$1
+[[ "$V" != "--" ]] || V=9.1
+
+[[ "$V" == "9.2" ]] && {
+  add-apt-repository -y ppa:pitti/postgresql
+  apt-get update
+}
+
+apt-get -y install postgresql-$V postgresql-client-$V postgresql-contrib-$V postgresql-plperl-$V
+
+# allow connect from host machine
+echo "host  all all 172.17.0.0/16 md5" >> /etc/postgresql/$V/main/pg_hba.conf
+# listen network
+echo "listen_addresses = '*'"  >> /etc/postgresql/$V/main/postgresql.conf
+
+# EXPOSE 5432
+add_port 5432
+add_boot /etc/init.d/postgresql start
+
+
+# Create primary database objects
+# plperl
+# users op & apache
+
+echo "Postgresql initial setup"
+[ -a /var/run/postgresql/.s.PGSQL.5432 ] || /etc/init.d/postgresql start
+
+[ -a /var/run/postgresql/.s.PGSQL.5432 ] || { echo "PG socket does not exists" ; exit 1; }
+
+sudo -u postgres createlang plperl template1
+sudo -u postgres createuser -d -r -s op
+sudo -u postgres createdb -O op op
+
+sudo -u postgres psql -c "create user apache password 'apache'" template1
+
+/etc/init.d/postgresql stop

@@ -1,0 +1,15 @@
+
+# attach apt-cacher-ng
+# http://www.unix-ag.uni-kl.de/~bloch/acng/html/config-servquick.html
+
+# WARN: don't forget to open port 3142 in ufw
+
+GW=$1
+
+# get gw ip
+# http://serverfault.com/questions/31170/how-to-find-the-gateway-ip-address-in-linux
+[[ "$GW" != "--" ]] || GW=$(ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3)
+
+echo "Build charm apt-proxy for $GW:3142"
+echo "Acquire::http { Proxy \"http://$GW:3142\"; };" > /etc/apt/apt.conf.d/02proxy
+

@@ -1,0 +1,9 @@
+apt-cacher #192.168.4.121
+update
+language ru
+ssh
+user op
+
+mc # love it
+
+# postgres 9.1

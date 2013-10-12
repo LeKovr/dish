@@ -1,0 +1,13 @@
+
+# -------------------------------------------------------------------------------
+# Common shell
+
+run_on_boot=$1
+
+require update
+
+apt-get install -y --force-yes mc gettext
+
+[[ "$run_on_boot" == "boot" ]] && set_cmd /usr/bin/mc
+
+return 0

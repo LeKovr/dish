@@ -1,0 +1,6 @@
+
+L=$1
+[[ "$L" != "--" ]] || L=ru
+apt-get install -y language-pack-$L-base
+
+#  language-pack-$L

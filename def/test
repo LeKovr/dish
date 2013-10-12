@@ -1,0 +1,9 @@
+apt-cacher
+update
+language ru
+ssh
+mc boot
+
+user
+
+# postgres 9.1

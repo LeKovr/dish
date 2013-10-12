@@ -1,0 +1,22 @@
+
+
+# -------------------------------------------------------------------------------
+# SSH user
+
+U=$1
+[[ "$U" != "--" ]] || U=op
+
+useradd -d /home/$U -m -s /bin/bash -Gwww-data -gusers $U
+sudo -u $U mkdir -m 700 /home/$U/.ssh
+
+[ -f $TMP_PREFIX.keys ] && {
+  cp $TMP_PREFIX.keys /home/$U/.ssh/authorized_keys
+  chown $U:users /home/$U/.ssh/authorized_keys
+  chmod 600 /home/$U/.ssh/authorized_keys
+}
+
+# Allow op to be root
+echo "$U ALL=NOPASSWD:/usr/bin/mc" > /etc/sudoers.d/$U
+# Allow sudo to self uid
+echo "$U ALL=($U)  NOPASSWD: ALL" >> /etc/sudoers.d/$U
+
