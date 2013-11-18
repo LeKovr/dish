@@ -1,9 +1,9 @@
-apt-cacher
+# This will be called by update if skip
+base
+
+# update apt package list and ubuntu packages
 update
+
+# setup utf8 locale
 language ru
-ssh
-mc boot
 
-user
-
-# postgres 9.1
