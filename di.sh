@@ -94,7 +94,7 @@ dish_run() {
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
     -dns $DNS \
-    $TAGPREFIX/$tag $@
+    $@ $TAGPREFIX/$tag
 }
 
 # ------------------------------------------------------------------------------
