@@ -1,0 +1,32 @@
+# dish def file
+# Setup development environment
+
+# use apt-cache-ng from host system
+apt-cacher
+
+# This will be called by update if skip
+base
+
+# update apt package list and ubuntu packages
+update
+
+# setup utf8 locale
+language ru
+
+# we will connect to container via ssh
+ssh
+
+# we will use midnight commander 
+mc # boot
+
+# create user "op" inside container
+user op
+
+# install nginx
+nginx
+
+# install postgresql (default - v9.1)
+postgres # 9.2
+
+# install PGWS deps
+pgws
