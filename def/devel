@@ -14,7 +14,7 @@ update
 language ru
 
 # we will connect to container via ssh
-ssh
+# ssh
 
 # we will use midnight commander 
 mc # boot
@@ -28,5 +28,7 @@ nginx
 # install postgresql (default - v9.1)
 postgres # 9.2
 
-# install PGWS deps
-pgws
+# build latest uwsgi
+uwsgi
+
+
