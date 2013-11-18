@@ -8,7 +8,7 @@ apt-get -y install make gawk libjson-perl libwww-perl cpanminus \
  liblocale-maketext-lexicon-perl liblocale-maketext-simple-perl \
  libtemplate-perl libmime-perl libipc-shareable-perl liburi-perl \
  libtext-multimarkdown-perl libtext-diff-perl \
- libany-moose-perl
+ libany-moose-perl libxml-simple-perl
 
 cpanm FCGI::Client
 
