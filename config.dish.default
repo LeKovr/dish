@@ -16,7 +16,7 @@ TAGPREFIX=lekovr
 USER_PUB_KEYS=~/.ssh/authorized_keys
 
 # DNS server
-# DNS=192.168.1.1
+# DNS=8.8.8.8
 
 # Mount current dir to dis path
 APP_ROOT=/home/app
