@@ -6,12 +6,16 @@
 V=$1
 [[ "$V" != "--" ]] || V=9.1
 
-[[ "$V" == "9.2" ]] && {
+if [[ "$V" == "9.2" ]] ; then
   add-apt-repository -y ppa:pitti/postgresql
   apt-get update
-}
+elif [[ "$V" == "9.3" ]] ; then
+  echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgsql-9.3.list
+  apt-get update
+fi
 
-apt-get -y install postgresql-$V postgresql-client-$V postgresql-contrib-$V postgresql-plperl-$V
+apt-get -y --force-yes install postgresql-$V postgresql-client-$V postgresql-contrib-$V postgresql-plperl-$V || 
+  { echo "PG packages install problems" ; exit 1; }
 
 # allow connect from host machine
 echo "host  all all 172.17.0.0/16 md5" >> /etc/postgresql/$V/main/pg_hba.conf
