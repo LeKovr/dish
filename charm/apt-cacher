@@ -11,7 +11,8 @@ GW=$1
 [[ "$GW" != "--" ]] || GW=$(ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3)
 
 # set to 0 if port is open
-noport=$(nc 127.0.0.1 3142 < /dev/null; echo $?)
+#noport=$(nc 127.0.0.1 3142 < /dev/null; echo $?)
+noport=$(nc $GW 3142 < /dev/null; echo $?)
 
 if [[ "$noport" == "0" ]] ; then
   # we have apt-cacher
