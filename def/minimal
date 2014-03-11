@@ -1,0 +1,8 @@
+
+# use apt-cache-ng from host system
+apt-cacher
+
+base
+update
+
+
