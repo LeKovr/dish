@@ -6,13 +6,19 @@ dish_help() {
 
   Usage:
     di.sh build|run DEF[:RELEASE]
+    or
+    di.sh run DEF[:RELEASE][ OPTIONS]
+    or
+    di.sh rund DEF[:RELEASE][ OPTIONS]
 
   Where
     build   - build docker image with def/DEF definition file
     run     - run docker container for image $TAGPREFIX/$DEF[:RELEASE]
+    rund    - run docker container for image $TAGPREFIX/$DEF[:RELEASE] in daemon mode (detached)
 
     DEF     - name of definition file (from def/ dir)
     RELEASE - image version id, default: latest
+    OPTIONS - docker run command options
 
 EOF
 }
@@ -72,9 +78,10 @@ dish_build() {
   echo "commit of $cid with $def:$rel, cmd $@ "
   cid=$(sudo docker commit -author="$MAINTAINER" \
     -run="{\"Hostname\" : \"$def\", \"Entrypoint\" : [\"/di.sh\"], \"WorkingDir\" : \"$APP_ROOT\"$ports}" \
-    $cid $TAGPREFIX/$def $rel)
+    $cid $TAGPREFIX/$def:$rel)
   [[ "$rel" == "latest" ]] || sudo docker tag -f $cid $TAGPREFIX/$def
 
+  echo "Prefix: $prefix"
   rm -f $prefix.*
   [ -f "$TMP_DIR/*" ] || rmdir $TMP_DIR
 
@@ -91,6 +98,23 @@ dish_run() {
   [[ "$def" == "$rel" ]] && rel=""
   [[ "$rel" ]] && rel="-${rel/./_}"
   sudo docker run -i -t \
+    -h "$def$rel" \
+    -v $PWD:$APP_ROOT \
+    -dns $DNS \
+    $@ $TAGPREFIX/$tag
+}
+
+# ------------------------------------------------------------------------------
+
+dish_rund() {
+  local tag=$1
+  shift
+
+  local def=${tag%:*} # remove rel
+  local rel=${tag#*:} # remove def
+  [[ "$def" == "$rel" ]] && rel=""
+  [[ "$rel" ]] && rel="-${rel/./_}"
+  sudo docker run -d \
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
     -dns $DNS \
@@ -126,6 +150,9 @@ case "$cmd" in
     ;;
   run)
     dish_run $@
+    ;;
+  rund)
+    dish_rund $@
     ;;
   *)
     dish_help
