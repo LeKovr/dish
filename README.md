@@ -35,8 +35,8 @@ Quick start
 
 ```
 host$ cd /home/dish
-host$ ./di.sh build demo
-#.. dish builds your docker image
+host$ ./di.sh build demo:1.1
+#.. dish builds your docker image and tag it with "1.1"
 host$ cd /home/app
 host$ ../dish/di.sh run demo
 #.. you're inside running docker image container
@@ -156,8 +156,10 @@ Recommended usage
 =================
 
 1. Use ubuntu
-2. Install and run [Apt-Cacher NG](http://www.unix-ag.uni-kl.de/~bloch/acng/)
-3. add a line "apt-cacher IP" as first line in your image defs
+2. Install and run [Apt-Cacher NG](http://www.unix-ag.uni-kl.de/~bloch/acng/), 
+3. Configure apt-cacher-ng:
+3.1. If it was installed locally, allow access with "ufw allow 3142" and add a line "apt-cacher" as first line in your image defs
+3.2. For remote access, add a line "apt-cacher IP" as first line in your image defs
 
 
 Notes
