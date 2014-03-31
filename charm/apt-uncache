@@ -1,0 +1,4 @@
+
+# remove apt-cacher proxy for standalone servers
+
+[ -f /etc/apt/apt.conf.d/02proxy ] && rm /etc/apt/apt.conf.d/02proxy

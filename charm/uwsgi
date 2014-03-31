@@ -1,0 +1,29 @@
+
+# http://projects.unbit.it/downloads/uwsgi-VERSION.tar.gz
+
+apt-get install -y build-essential python \
+  libperl-dev libcoro-perl \
+  libxml2-dev libpcre3-dev libcap2-dev \
+  || exit 1
+
+pushd tmp
+
+if [ -f ../asset/uwsgi-master.zip ] ; then
+  unzip ../asset/uwsgi-master.zip
+else
+  echo "downloading latest uWSGI tarball..."
+  curl -o uwsgi_latest.tar.gz http://projects.unbit.it/downloads/uwsgi-latest.tar.gz
+  [ -d uwsgi-master ] || mkdir uwsgi-master
+  tar zvxC uwsgi-master --strip-components=1 -f uwsgi_latest.tar.gz
+fi
+
+#curl http://uwsgi.it/install | bash -s coroae /usr/local/bin/uwsgi
+
+cd uwsgi-master
+UWSGI_PROFILE="coroae" UWSGI_BIN_NAME="/usr/local/bin/uwsgi" make
+
+popd
+
+#rm -rf tmp/uwsgi*
+
+
