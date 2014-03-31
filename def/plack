@@ -1,0 +1,25 @@
+# dish def file
+# Setup Plack Postgresql Uwsgi environment
+# Build time: ~ 4 min with apt-cacher-ng
+
+# Usage: 
+#  dish build plack:01 lekovr/base:1204.01
+
+# supervisord
+server boot
+
+# we will connect to container via ssh
+ssh
+
+# install nginx
+nginx
+
+# install postgresql (default - v9.1)
+postgres 9.3
+
+# install supervisord & build uwsgi
+uwsgi
+
+# install Plack deps
+plack
+
