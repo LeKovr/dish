@@ -1,13 +1,27 @@
 
 # -------------------------------------------------------------------------------
+require server
+
 
 # Disable upstart for ssh
 dpkg-divert --local --rename --add /etc/init/ssh.conf
 
 apt-get install -y curl lsb-release openssh-server
 
+mkdir -p /var/run/sshd
+
 # EXPOSE 22
 add_port 22
-add_boot /etc/init.d/ssh start
+
+#add_boot /etc/init.d/ssh start
+
+cat >> /etc/supervisor/conf.d/ssh.conf <<EOF
+[program:ssh]
+command=/usr/sbin/sshd -D
+autorestart=true
+EOF
+
+#set_cmd /usr/bin/supervisord
+
 
 

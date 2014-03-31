@@ -1,0 +1,22 @@
+# charm to setup standalone postgres instance
+
+run_on_boot=$1
+
+require postgres
+
+# backup empty database
+mv /var/lib/postgresql/$V /var/lib/postgresql/$V.eta
+
+# setup postgres into work dir
+[ -d /home/app/postgresql ] || mkdir /home/app/postgresql
+
+[ -d /home/app/postgresql/$V ] || cp -pr /var/lib/postgresql/$V.eta  /home/app/postgresql/$V
+
+ln -s /home/app/postgresql/$V /var/lib/postgresql/$V
+
+
+# allow DEVEL connect from host machine
+sed -i "/^host  all all 172.17.0.0\/16 md5/c host  all all 172.17.0.0\/16 trust" /etc/postgresql/$V/main/pg_hba.conf
+
+add_init "[ -d /home/app/postgresql/$V ] || mkdir /home/app/postgresql && cp -rp /var/lib/postgresql/$V.eta /home/app/postgresql/"
+

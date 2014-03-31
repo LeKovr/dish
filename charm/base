@@ -5,9 +5,41 @@
 # Disallow shell questions
 export DEBIAN_FRONTEND=noninteractive
 
-# Hack for initctl
-# See: https://github.com/dotcloud/docker/issues/1024
-dpkg-divert --local --rename --add /sbin/initctl
-ln -s /bin/true /sbin/initctl
+  # Hack for initctl
+if grep -q 12.04 /etc/lsb-release ; then
+  # See https://github.com/racker/docker-ubuntu-with-updates/blob/master/precise/Dockerfile#L5
 
-sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
+  # Work around initramfs-tools running on kernel 'upgrade': <http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=594189>
+  export INITRD=No
+
+  # Work around initscripts trying to mess with /dev/shm: <https://bugs.launchpad.net/launchpad/+bug/974584>
+  # Used by our `src/ischroot` binary to behave in our custom way, to always say we are in a chroot.
+  export FAKE_CHROOT=1
+  mv /usr/bin/ischroot /usr/bin/ischroot.original
+  cat > /usr/bin/ischroot <<EOF
+#!/bin/sh
+
+if [ -z "$FAKE_CHROOT" ]; then
+exec /usr/bin/ischroot.original
+else
+exit 0
+fi
+EOF
+  chmod a+x /usr/bin/ischroot
+
+  # Configure no init scripts to run on package updates.
+cat > /usr/sbin/policy-rc.d <<EOF
+#!/bin/sh
+
+exit 101
+EOF
+
+  echo 'force-unsafe-io' | tee /etc/dpkg/dpkg.cfg.d/02apt-speedup
+
+else
+  # See: https://github.com/dotcloud/docker/issues/1024
+  dpkg-divert --local --rename --add /sbin/initctl
+  ln -s /bin/true /sbin/initctl
+  sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
+fi
+

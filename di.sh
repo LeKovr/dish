@@ -41,15 +41,25 @@ dish_build() {
   local prefix=$TMP_DIR/dish-$$
   local cid_file=$prefix.cid
   local port_file=$prefix.ports
+  local entry_file=$prefix.entry
+
   [ -f $cid_file ] && rm -f $cid_file
+  [ -f $entry_file ] && rm -f $entry_file
   [ -f $USER_PUB_KEYS ] && cp -L $USER_PUB_KEYS $prefix.keys
+
+  local base=$1
+  [ "$base" ] || base="$BASE_IMAGE:$BASE_TAG"
+  echo "Using base image $base"
 
   sudo docker run -i \
     -v $PWD:$APP_ROOT \
     -w $APP_ROOT \
     -dns $DNS \
     -cidfile=$cid_file \
-    $BASE_IMAGE:$BASE_TAG /bin/bash build.dish $def $prefix $CONT_CMD || { echo "Build failed. Exiting." ; exit 1 ; }
+    -e LC1=$LANGUAGE \
+    -e BASE_IMAGE=$base \
+    --entrypoint="/bin/bash" \
+    $base build.dish $def $prefix $CONT_CMD || { echo "Build failed. Exiting." ; exit 1 ; }
 
   [ -f $cid_file ] || {
     echo "No cidfile, aborting"
@@ -60,6 +70,9 @@ dish_build() {
   echo "Wait for docker stop"
   rv=$(sudo docker wait $cid)
   [[ "$rv" == "0" ]] || { echo "Build stop failed. Exiting." ; exit ; }
+
+  local entry="/di.sh"
+  [ -f $entry_file ] && entry=$(cat $entry_file)
 
   # Get ports
   local ports=""
@@ -77,7 +90,7 @@ dish_build() {
   [[ "$rel" ]] || rel=latest
   echo "commit of $cid with $def:$rel, cmd $@ "
   cid=$(sudo docker commit -author="$MAINTAINER" \
-    -run="{\"Hostname\" : \"$def\", \"Entrypoint\" : [\"/di.sh\"], \"WorkingDir\" : \"$APP_ROOT\"$ports}" \
+    -run="{\"Hostname\" : \"$def\", \"Entrypoint\" : [\"$entry\"], \"WorkingDir\" : \"$APP_ROOT\"$ports}" \
     $cid $TAGPREFIX/$def:$rel)
   [[ "$rel" == "latest" ]] || sudo docker tag -f $cid $TAGPREFIX/$def
 
@@ -101,6 +114,7 @@ dish_run() {
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
     -dns $DNS \
+    --entrypoint=/di.sh \
     $@ $TAGPREFIX/$tag
 }
 
@@ -127,7 +141,7 @@ cmd=$1
 shift
 
 DISH_ROOT=$(dirname $(readlink -f $0))
-
+echo $DISH_ROOT
 # ------------------------------------------------------------------------------
 
 # get config

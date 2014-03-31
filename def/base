@@ -1,5 +1,7 @@
-# dish def file
-# Setup debelopment environment
+# Usage:
+#  dish build base:1204.01 ubuntu/12:04
+# or
+#  dish build base:1210.01 ubuntu/12:10
 
 # use apt-cache-ng from host system
 apt-cacher
@@ -13,22 +15,8 @@ update
 # setup utf8 locale
 language ru
 
-# we will connect to container via ssh
-# ssh
-
 # we will use midnight commander 
 mc # boot
 
 # create user "op" inside container
 user op
-
-# install nginx
-nginx
-
-# install postgresql (default - v9.1)
-postgres # 9.2
-
-# build latest uwsgi
-uwsgi
-
-

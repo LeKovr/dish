@@ -1,6 +1,14 @@
 
 L=$1
-[[ "$L" != "--" ]] || L=ru
+
+# Host system vars
+# LC1=$LANGUAGE
+
+[[ "$L" != "--" ]] || L=${LC1%:*}
+
 apt-get install -y language-pack-$L-base
+
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8
 
 #  language-pack-$L

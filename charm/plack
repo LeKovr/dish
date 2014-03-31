@@ -1,0 +1,55 @@
+
+apt-get -y install \
+  libdbd-pg-perl libanyevent-xmpp-perl \
+  libconfig-general-perl \
+  libplack-perl \
+  libplack-middleware-session-perl \
+  libcoro-perl \
+  libanyevent-dbd-pg-perl \
+  libanyevent-xmpp-perl \
+  libdatetime-locale-perl \
+  libdatetime-timezone-perl \
+  libdatetime-perl \
+  libnet-oauth-perl \
+  liburi-query-perl \
+  libjson-any-perl \
+  libjson-xs-perl \
+  libyaml-perl \
+  libclass-load-xs-perl \
+  libyaml-libyaml-perl \
+  libmoose-perl \
+  liblog-any-perl \
+  libtemplate-perl \
+  libjson-perl \
+  libtest-harness-perl \
+  libdata-dump-perl \
+  libtext-microtemplate-perl \
+  libclass-method-modifiers-perl \
+  libtest-fatal-perl \
+  libtest-exception-perl \
+  libsub-uplevel-perl \
+  libtemplate-tiny-perl \
+  libtest-deep-perl \
+  libtest-tester-perl \
+  libtest-nowarnings-perl \
+  libfile-slurp-perl \
+  liblog-dispatch-perl \
+  cpanminus make patch \
+  perl-modules \
+  perlmagick \
+  libspreadsheet-parseexcel-perl \
+  libtest-requires-perl || exit 1
+
+# not available in 12.04
+#  libexcel-writer-xlsx-perl \
+
+#  libmodule-build-tiny-perl \
+
+cpanm Net::uwsgi && \
+cpanm Plack::Middleware::Debug && \
+cpanm Plack::Middleware::OAuth && \
+cpanm JSON::RPC::Dispatcher && \
+cpanm Data::MessagePack && \
+cpanm Kelp && \
+cpanm Kelp::Module::Config::YAML &&
+cpanm Excel::Writer::XLSX || exit 1

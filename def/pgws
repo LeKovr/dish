@@ -1,32 +1,26 @@
 # dish def file
 # Setup development environment
 
-# use apt-cache-ng from host system
-apt-cacher
+# Usage: 
+#  dish build pgws:01 lekovr/base:1210.01
 
-# This will be called by update if skip
-base
+# 12.10 is used because 12.04 has only Template version 2.22
+# Template version 2.24 required--this is only version 2.22
 
-# update apt package list and ubuntu packages
-update
-
-# setup utf8 locale
-language ru
+# supervisord
+server boot
 
 # we will connect to container via ssh
 ssh
 
-# we will use midnight commander 
-mc # boot
-
-# create user "op" inside container
-user op
+# install postgresql (default - v9.1)
+postgres 9.3
 
 # install nginx
 nginx
 
-# install postgresql (default - v9.1)
-postgres # 9.2
-
 # install PGWS deps
 pgws
+
+# for remote host
+# apt-uncache
