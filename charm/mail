@@ -1,0 +1,122 @@
+#!/bin/bash
+
+# setup supervisor
+
+# Disallow shell questions
+export DEBIAN_FRONTEND=noninteractive
+
+require server
+
+# Part 1. Outgoing mail only
+#http://terraltech.com/opendkim-to-sign-postfix-mails-on-ubuntu/
+
+apt-get install -y postfix opendkim opendkim-tools || exit 1
+
+KEYDIR=/home/app/postfix-dkim
+SELECTOR=mail
+
+
+grep -qE '^SOCKET="inet:8891@localhost"' /etc/default/opendkim || echo 'SOCKET="inet:8891@localhost"' >> /etc/default/opendkim
+
+grep -qE '# ** dish setup **' /etc/opendkim.conf || {
+
+cat >> /etc/opendkim.conf <<EOF
+
+# ** dish setup **
+
+Selector $SELECTOR
+
+# Identifies a set internal hosts whose mail should be signed rather than verified.
+InternalHosts $KEYDIR/dkimhosts
+# Identifies a set of "external" hosts that may send mail through the server as one of the signing domains without credentials as such.
+ExternalIgnoreList $KEYDIR/dkimhosts
+
+# outgoing only
+Mode s
+
+# список ключей -
+KeyTable file:$KEYDIR/keytable
+# соответствие адресов/доменов и ключей -
+SigningTable file:$KEYDIR/signingtable
+
+# на время отладки включим расширенное логгирование
+LogWhy yes
+X-Header yes
+
+EOF
+}
+
+grep -qE '# ** dish setup **' /etc/postfix/main.cf || {
+
+cat >> /etc/postfix/main.cf <<EOF
+
+# ** dish setup **
+
+# DKIM
+milter_default_action = accept
+milter_protocol = 2
+smtpd_milters = inet:localhost:8891
+non_smtpd_milters = inet:localhost:8891
+
+EOF
+}
+
+# allow LAN relay
+postconf -e "mynetworks = 172.17.0.0/16 127.0.0.0/8"
+
+[ -f /etc/supervisor/conf.d/postfix.conf ] || cat >> /etc/supervisor/conf.d/postfix.conf <<EOF
+[program:postfix]
+process_name = master
+directory = /etc/postfix
+command = /usr/sbin/postfix -c /etc/postfix start
+startsecs = 2
+autorestart = false
+EOF
+
+[ -f /etc/supervisor/conf.d/opendkim.conf ] || cat >> /etc/supervisor/conf.d/opendkim.conf <<EOF
+[program:opendkim]
+process_name = opendkim
+command = /usr/sbin/opendkim -x /etc/opendkim.conf -u opendkim -P /var/run/opendkim/opendkim.pid -p inet:8891@localhost
+EOF
+
+[ -f /etc/postfix/boot.sh ] || cat >> /etc/postfix/boot.sh <<EOD
+
+[ -d $KEYDIR ] || {
+  mkdir $KEYDIR
+  openssl genrsa -out $KEYDIR/private.key 1024
+  openssl rsa -in $KEYDIR/private.key -out $KEYDIR/public.key -pubout -outform PEM
+  chmod 600 $KEYDIR/private.key
+}
+
+[ -f $KEYDIR/keytable ] || cat > $KEYDIR/keytable <<EOF
+$SELECTOR._domainkey.\$MAILDOMAIN \$MAILDOMAIN:$SELECTOR:$KEYDIR/private.key
+EOF
+
+[ -f $KEYDIR/signingtable ] || cat > $KEYDIR/signingtable <<EOF
+\$MAILDOMAIN $SELECTOR._domainkey.\$MAILDOMAIN
+EOF
+
+[ -f $KEYDIR/dkimhosts ] || cat >> $KEYDIR/dkimhosts <<EOF
+127.0.0.1
+localhost
+172.17.0.0/16
+\$MAILDOMAIN
+EOF
+
+KEYPUB=\$(cat $KEYDIR/public.key)
+
+cat <<EOF
+********
+Add DNS entry:
+
+entry name:
+$SELECTOR._domainkey.\$MAILDOMAIN
+entry value:
+v=DKIM1; k=rsa; p=\$KEYPUB
+EOF
+
+EOD
+
+add_init '[[ "$MAILDOMAIN" ]] || MAILDOMAIN=localhost.localdomain'
+add_init 'postconf -e "myhostname = $MAILDOMAIN"'
+add_init "[ -f boot.sh ] || echo '. /etc/postfix/boot.sh' > boot.sh"

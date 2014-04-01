@@ -1,0 +1,20 @@
+# dish def file
+# Setup mail server
+# Current config: outgoing mail only
+
+# Usage: 
+#  dish build mail:01 lekovr/base:1204.01
+# Run:
+#  dish run mail:04 -rm -p 35:25 -e MAILDOMAIN=cloud.el-f.pro
+
+# supervisord
+server boot
+
+# we will connect to container via ssh
+ssh
+
+# postfix
+mail
+
+# for remote host
+# apt-uncache

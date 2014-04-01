@@ -1,0 +1,9 @@
+
+
+require mail
+
+# http://serverfault.com/questions/320320/postfix-development-server-intercept-all-outgoing-mail?rq=1
+
+postconf -e "virtual_alias_maps = pcre:/etc/postfix/virtual"
+
+add_init 'echo "/.*@.*/ $MAILRCPT" > /etc/postfix/virtual
