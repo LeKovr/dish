@@ -92,6 +92,7 @@ cat > $run_file <<EOF
 # Base image: $BASE_IMAGE
 
 echo "Run $DEF container"
+[ "\$DISHMODE" == "bg" ] && echo "Daemon mode"
 
 EOF
 
@@ -104,10 +105,23 @@ done < def/$DEF
 [ -f $TMP_PREFIX.init ] && cat $TMP_PREFIX.init >> $run_file
 [ -f $TMP_PREFIX.boot ] && cat $TMP_PREFIX.boot >> $run_file
 
-echo '[ -f boot.sh ] && /bin/bash boot.sh' >> $run_file
+echo '[ -f boot.sh ] && /bin/bash boot.sh '$DEF >> $run_file
 
 [[ "$CMD" ]] || CMD="$@"
-echo $CMD >> $run_file
+#echo $CMD >> $run_file
+
+cat >> $run_file <<EOF
+if [[ "\$DISHMODE" == "bg" ]] ; then
+  [ -f /etc/supervisor/conf.d/daemon.conf ] && rm /etc/supervisor/conf.d/daemon.conf
+  exec /usr/bin/supervisord
+else
+  echo -e [supervisord]\\\\nnodaemon=false > /etc/supervisor/conf.d/daemon.conf
+  service supervisor start
+  $CMD
+  service supervisor stop
+  rm /etc/supervisor/conf.d/daemon.conf
+fi
+EOF
 
 # exec down commands in reverse order
 [ -f $TMP_PREFIX.down ] && tac $TMP_PREFIX.down  >> $run_file

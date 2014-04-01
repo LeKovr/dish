@@ -132,6 +132,7 @@ dish_rund() {
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
     -dns $DNS \
+    -e DISHMODE=bg \
     $@ $TAGPREFIX/$tag
 }
 

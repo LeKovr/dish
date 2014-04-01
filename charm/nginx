@@ -19,7 +19,7 @@ EOF
 
 echo "daemon off;" >> /etc/nginx/nginx.conf
 
-cat >> /etc/supervisor/conf.d/nginx.conf <<EOF
+[ -f /etc/supervisor/conf.d/nginx.conf] || cat >> /etc/supervisor/conf.d/nginx.conf <<EOF
 [program:nginx]
 command=/usr/sbin/nginx
 stdout_events_enabled=true

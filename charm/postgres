@@ -48,6 +48,7 @@ command=/usr/lib/postgresql/$V/bin/postgres -D /var/lib/postgresql/$V/main -c co
 user=postgres
 autorestart=true
 stopsignal=INT
+redirect_stderr=true
 EOF
 
 # EXPOSE 5432

@@ -14,10 +14,10 @@ nodaemon=true
 EOF
 
 
-[[ $1 == "boot" ]] && set_entry /usr/bin/supervisord
+#[[ $1 == "boot" ]] && set_entry /usr/bin/supervisord
 
-add_boot "echo -e [supervisord]\\\\nnodaemon=false >  /etc/supervisor/conf.d/daemon.conf"
-add_boot service supervisor start
+#add_boot "echo -e [supervisord]\\\\nnodaemon=false >  /etc/supervisor/conf.d/daemon.conf"
+#add_boot service supervisor start
 
-add_down rm /etc/supervisor/conf.d/daemon.conf
-add_down service supervisor stop
+#add_down rm /etc/supervisor/conf.d/daemon.conf
+#add_down service supervisor stop
