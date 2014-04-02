@@ -21,16 +21,17 @@ grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gww
 [ -d $HOMEDIR/.ssh ] ||  sudo -u $NEWUSER mkdir -m 700 $HOMEDIR/.ssh
 
 [ -f $HOMEDIR/.ssh/authorized_keys ] || {
+  key=""
   if [ -f $KEY0 ] ; then
-    KEY=$KEY0
+    key=$KEY0
   elif [ -f $KEY1 ] ; then
-    KEY=$KEY1
+    key=$KEY1
   else
     echo "WARNING: ssh key not found"
   fi
-  [ "$KEY" ] && {
-    echo "Using pub key $KEY"
-    cat $KEY | head -1 > $HOMEDIR/.ssh/authorized_keys
+  [[ "$key" ]] && {
+    echo "Using pub key $key"
+    cat $key | head -1 > $HOMEDIR/.ssh/authorized_keys
     chown $NEWUSER $HOMEDIR/.ssh/authorized_keys
     chmod 600 $HOMEDIR/.ssh/authorized_keys
   }
