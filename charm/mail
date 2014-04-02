@@ -90,28 +90,24 @@ localhost
 \$MAILDOMAIN
 EOF
 
-KEYPUB=\$(cat $KEYDIR/public.key)
+KEYPUB=\$(head -n 5 $KEYDIR/public.key | tail -n +2 | tr -d '\n')
 
 cat <<EOF
-********
-You should Add DNS entry:
+; *****************************************************************************
+; ** You should add these DNS entries:
 
-entry name:
-$SELECTOR._domainkey.\$MAILDOMAIN
-entry value:
-v=DKIM1; k=rsa; p=\$KEYPUB
+$SELECTOR._domainkey.\$MAILDOMAIN	TXT	"v=DKIM1; k=rsa; p=\$KEYPUB"
+_adsp._domainkey.\$MAILDOMAIN		TXT	"dkim=all"
+\$MAILDOMAIN				TXT	"v=spf1 ip4:YOUR_EXT_IP a:\$MAILDOMAIN ~all"
 
-entry name:
-\$MAILDOMAIN
-entry value:
-v=spf1 ip4:YOUR_EXT_IP a:\$MAILDOMAIN ~all
+; *****************************************************************************
 EOF
 
 EOD
 
 add_init '[[ "$MAILDOMAIN" ]] || MAILDOMAIN=localhost.localdomain'
 add_init 'postconf -e "myhostname = $MAILDOMAIN"'
-add_init "[ -f boot.sh ] || echo '. /etc/postfix/boot.sh' > boot.sh"
+add_init '. /etc/postfix/boot.sh'
 
 add_service opendkim
 add_service postfix

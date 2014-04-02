@@ -14,4 +14,4 @@ ssh
 mail
 
 # for remote host
-# apt-uncache
+apt-uncache
