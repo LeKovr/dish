@@ -8,7 +8,13 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get install -y postfix opendkim opendkim-tools || exit 1
 
-KEYDIR=/home/app/postfix-dkim
+# Files might be generated on every boot
+KEYDIR=/home/app/generated/mail
+
+# Create once, stored on host system
+KEYFILE=/home/app/srv/mail/private.key
+
+# DKIM name
 SELECTOR=mail
 
 
@@ -63,16 +69,14 @@ postconf -e "mynetworks = 172.17.0.0/16 127.0.0.0/8"
 
 [ -f /etc/postfix/boot.sh ] || cat >> /etc/postfix/boot.sh <<EOD
 
-[ -d $KEYDIR ] || {
-  mkdir $KEYDIR
-  openssl genrsa -out $KEYDIR/private.key 1024
-  openssl rsa -in $KEYDIR/private.key -out $KEYDIR/public.key -pubout -outform PEM
-  chmod 600 $KEYDIR/private.key
-  chown opendkim $KEYDIR/private.key
-}
+[ -d $KEYDIR ] || mkdir -p $KEYDIR
+[ -f $KEYFILE ] || openssl genrsa -out $KEYFILE 1024
+openssl rsa -in $KEYFILE -out $KEYDIR/public.key -pubout -outform PEM
+chmod 600 $KEYFILE
+chown opendkim $KEYFILE
 
 [ -f $KEYDIR/keytable ] || cat > $KEYDIR/keytable <<EOF
-$SELECTOR._domainkey.\$MAILDOMAIN \$MAILDOMAIN:$SELECTOR:$KEYDIR/private.key
+$SELECTOR._domainkey.\$MAILDOMAIN \$MAILDOMAIN:$SELECTOR:$KEYFILE
 EOF
 
 [ -f $KEYDIR/signingtable ] || cat > $KEYDIR/signingtable <<EOF
