@@ -5,7 +5,7 @@
 # Usage: 
 #  dish build mail:01 lekovr/base:1204.01
 # Run:
-#  dish run mail:04 -rm -p 35:25 -e MAILDOMAIN=cloud.el-f.pro
+#  dish run mail:04 -rm -p 35:25 -e MAILDOMAIN=example.com
 
 # we will connect to container via ssh
 ssh
