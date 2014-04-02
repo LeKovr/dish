@@ -38,13 +38,7 @@ grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gww
 }
 
 [ -f /etc/sudoers.d/$NEWUSER ] || {
-  cat > /etc/sudoers.d/$NEWUSER <<-EOF
-	$NEWUSER ALL=NOPASSWD:/usr/bin/supervisorctl
-	$NEWUSER ALL=NOPASSWD:/usr/sbin/nginx
-	$NEWUSER ALL=NOPASSWD:/usr/bin/docker
-	$NEWUSER ALL=NOPASSWD:/usr/bin/mc
-	$NEWUSER ALL=($NEWUSER) NOPASSWD:ALL
-	EOF
+  echo "$NEWUSER ALL=NOPASSWD:ALL" > /etc/sudoers.d/$NEWUSER
   chmod 440 /etc/sudoers.d/$NEWUSER
 }
 
