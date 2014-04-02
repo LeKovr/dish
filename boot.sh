@@ -2,4 +2,6 @@
 
 # Called by container's /di.sh at startup
 
-echo "Boot point"
+DEF=$1
+echo "Boot point for image $DEF"
+

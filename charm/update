@@ -1,6 +1,17 @@
 
-require base
+IN_DISH="$1"
+[[ "$IN_DISH" == "--" ]] || IN_DISH=""
 
+[[ "$IN_DISH" ]] && require base
+
+# Prepare ru locale
+locale-gen ru_RU.UTF-8
+
+# setup en locale in utf8 as default
+locale-gen en_US.UTF-8
+update-locale LANG=en_US.UTF-8
+
+# update debs
 apt-get update
 apt-get upgrade -y
 

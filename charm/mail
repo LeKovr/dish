@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# setup supervisor
-
 # Disallow shell questions
 export DEBIAN_FRONTEND=noninteractive
-
-require server
 
 # Part 1. Outgoing mail only
 #http://terraltech.com/opendkim-to-sign-postfix-mails-on-ubuntu/
@@ -64,20 +60,6 @@ EOF
 # allow LAN relay
 postconf -e "mynetworks = 172.17.0.0/16 127.0.0.0/8"
 
-[ -f /etc/supervisor/conf.d/postfix.conf ] || cat >> /etc/supervisor/conf.d/postfix.conf <<EOF
-[program:postfix]
-process_name = master
-directory = /etc/postfix
-command = /usr/sbin/postfix -c /etc/postfix start
-startsecs = 2
-autorestart = false
-EOF
-
-[ -f /etc/supervisor/conf.d/opendkim.conf ] || cat >> /etc/supervisor/conf.d/opendkim.conf <<EOF
-[program:opendkim]
-process_name = opendkim
-command = /usr/sbin/opendkim -x /etc/opendkim.conf -u opendkim -P /var/run/opendkim/opendkim.pid -p inet:8891@localhost
-EOF
 
 [ -f /etc/postfix/boot.sh ] || cat >> /etc/postfix/boot.sh <<EOD
 
@@ -107,12 +89,17 @@ KEYPUB=\$(cat $KEYDIR/public.key)
 
 cat <<EOF
 ********
-Add DNS entry:
+You should Add DNS entry:
 
 entry name:
 $SELECTOR._domainkey.\$MAILDOMAIN
 entry value:
 v=DKIM1; k=rsa; p=\$KEYPUB
+
+entry name:
+\$MAILDOMAIN
+entry value:
+v=spf1 ip4:YOUR_EXT_IP a:\$MAILDOMAIN ~all
 EOF
 
 EOD
@@ -120,3 +107,7 @@ EOD
 add_init '[[ "$MAILDOMAIN" ]] || MAILDOMAIN=localhost.localdomain'
 add_init 'postconf -e "myhostname = $MAILDOMAIN"'
 add_init "[ -f boot.sh ] || echo '. /etc/postfix/boot.sh' > boot.sh"
+
+add_service opendkim
+add_service postfix
+add_port 25

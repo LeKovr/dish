@@ -6,12 +6,14 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get install -y supervisor || exit 1
 
-/etc/init.d/supervisor stop
+#/etc/init.d/supervisor stop
 
-cat >> /etc/supervisor/supervisord.conf <<EOF
-[supervisord]
-nodaemon=true
-EOF
+#cat >> /etc/supervisor/supervisord.conf <<EOF
+#[supervisord]
+#nodaemon=true
+#EOF
+
+echo supervisor >> /services
 
 
 #[[ $1 == "boot" ]] && set_entry /usr/bin/supervisord

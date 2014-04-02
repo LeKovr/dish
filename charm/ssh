@@ -1,27 +1,35 @@
 
 # -------------------------------------------------------------------------------
-require server
 
+IN_DISH="$1"
+[[ "$IN_DISH" == "--" ]] || IN_DISH=""
 
-# Disable upstart for ssh
-dpkg-divert --local --rename --add /etc/init/ssh.conf
+if [[ "$IN_DISH" ]] ; then
+  # Disable upstart for ssh
+  dpkg-divert --local --rename --add /etc/init/ssh.conf
 
-apt-get install -y curl lsb-release openssh-server
+  # EXPOSE 22
+  add_port 22
+
+  add_service ssh
+
+elif [ -f /etc/default/ufw ] ; then
+  # setup ufw
+  ufw allow 22/tcp
+  echo 'y' | ufw enable
+
+fi
+
+apt-get install -y curl lsb-release openssh-server || exit 1
 
 mkdir -p /var/run/sshd
 
-# EXPOSE 22
-add_port 22
+# Deny root login via ssh
+sed -i "/^PermitRootLogin.*/c PermitRootLogin no" /etc/ssh/sshd_config
+# Deny password logit
+sed -i "/PasswordAuthentication *yes/c PasswordAuthentication no" /etc/ssh/sshd_config
 
-#add_boot /etc/init.d/ssh start
-
-cat >> /etc/supervisor/conf.d/ssh.conf <<EOF
-[program:ssh]
-command=/usr/sbin/sshd -D
-autorestart=true
-EOF
-
-#set_cmd /usr/bin/supervisord
+service ssh reload
 
 
 

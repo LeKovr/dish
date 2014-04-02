@@ -1,0 +1,48 @@
+#
+# init.dish - init.d for dish images
+#
+SERV=/services
+F=/tmp/dish-init.fifo
+L=/var/log/dish-init.log
+
+function log() {
+  echo "[$(date +"%F %T")] $@" >> $L
+}
+
+function command() {
+  local cmd=$1
+  log "Going to $cmd services"
+  while read line ; do
+    s=${line%%#*} # remove endline comments
+    [ -n "${s##+([[:space:]])}" ] || continue # ignore line if contains only spaces
+    log "$cmd $line"
+    /etc/init.d/$line $cmd
+  done
+}
+
+function hook() {
+  log "Exiting"
+  [ -f $SERV ] && tac $SERV | command stop
+  [ -p $F ] && rm -f $F
+}
+
+[ -f $SERV ] && command start < $SERV
+  trap hook EXIT
+
+[ -f boot.sh ] && /bin/bash boot.sh $DEF
+
+if [[ "$DISHMODE" == "bg" ]] ; then
+  # Daemon mode - just wait for fifo read
+  [ -p $F ] || mkfifo $F || { log "Error: cannot make fifo $F" ; exit 2 ; }
+  chmod 400 $F
+
+  trap exit SIGTERM SIGINT
+
+  read < $F
+else
+  # Interactice mode - boot into $CMD (default: /bin/bash)
+  $CMD
+  # [ -f $SERV ] && tac $SERV | command stop
+  # exit runs hook
+fi
+

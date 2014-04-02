@@ -1,24 +1,53 @@
-
+#!/bin/bash
 
 # -------------------------------------------------------------------------------
 # SSH user
 
-U=$1
-[[ "$U" != "--" ]] || U=op
+# Get name from dish or shell args
+NEWUSER=$1
+[[ "$NEWUSER" && "$NEWUSER" != "--" ]] || NEWUSER=op
 
-D=/home/app/$U
-useradd -d $D -m -s /bin/bash -Gwww-data -gusers $U
-[ -d $D/.ssh ] || sudo -u $U mkdir -m 700 $D/.ssh
+# Cloud host default key
+KEY0=~/.ssh/authorized_keys
 
-[ -f $TMP_PREFIX.keys ] && [ ! $D/.ssh/authorized_keys ] && {
-  cp $TMP_PREFIX.keys $D/.ssh/authorized_keys
-  chown $U:users $D/.ssh/authorized_keys
-  chmod 600 $D/.ssh/authorized_keys
+# Dish host  default key
+KEY1=/home/app/op/.ssh/authorized_keys
+
+HOMEDIR=/home/app/$NEWUSER
+
+# Check if user exists already
+grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gwww-data -gusers $NEWUSER
+
+[ -d $HOMEDIR/.ssh ] ||  sudo -u $NEWUSER mkdir -m 700 $HOMEDIR/.ssh
+
+[ -f $HOMEDIR/.ssh/authorized_keys ] || {
+  if [ -f $KEY0 ] ; then
+    KEY=$KEY0
+  elif [ -f $KEY1 ] ; then
+    KEY=$KEY1
+  else
+    echo "WARNING: ssh key not found"
+  fi
+  [ "$KEY" ] && {
+    cat $KEY1 | head -1 > $HOMEDIR/.ssh/authorized_keys
+    chown $NEWUSER $HOMEDIR/.ssh/authorized_keys
+    chmod 600 $HOMEDIR/.ssh/authorized_keys
+  }
 }
 
-# Allow op to be root
-echo "$U ALL=NOPASSWD:/usr/bin/mc" > /etc/sudoers.d/$U
-# Allow sudo to self uid
-echo "$U ALL=($U)  NOPASSWD: ALL" >> /etc/sudoers.d/$U
+[ -f /etc/sudoers.d/$NEWUSER ] || {
+  cat > /etc/sudoers.d/$NEWUSER <<-EOF
+	$NEWUSER ALL=NOPASSWD:/usr/bin/supervisorctl
+	$NEWUSER ALL=NOPASSWD:/usr/sbin/nginx
+	$NEWUSER ALL=NOPASSWD:/usr/bin/docker
+	$NEWUSER ALL=NOPASSWD:/usr/bin/mc
+	$NEWUSER ALL=($NEWUSER) NOPASSWD:ALL
+	EOF
+  chmod 440 /etc/sudoers.d/$NEWUSER
+}
 
-chmod 440 /etc/sudoers.d/$U
+
+cat <<EOF
+User $NEWUSER setup complete
+You should ssh login via $NEWUSER now
+EOF

@@ -114,7 +114,6 @@ dish_run() {
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
     -dns $DNS \
-    --entrypoint=/di.sh \
     $@ $TAGPREFIX/$tag
 }
 

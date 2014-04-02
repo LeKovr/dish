@@ -4,6 +4,9 @@
 
 # WARN: don't forget to open port 3142 in ufw
 
+# Use
+# cat /home/app/charm/apt-cacher | bash -s -- --
+
 GW=$1
 
 # get gw ip
