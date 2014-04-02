@@ -41,8 +41,8 @@ export DISHROOT=$PWD/dish
     # обновим пакеты
     cat /home/app/charm/update | bash
 
-    # установим ssh
-    cat /home/app/charm/ssh | bash
+    # установим ssh (аргументы отключают upstart для ssh контейнера)
+    cat /home/app/charm/ssh | bash -s -- --
 
     # создадим пользователя (op)
     cat /home/app/charm/user | bash

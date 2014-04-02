@@ -68,6 +68,7 @@ postconf -e "mynetworks = 172.17.0.0/16 127.0.0.0/8"
   openssl genrsa -out $KEYDIR/private.key 1024
   openssl rsa -in $KEYDIR/private.key -out $KEYDIR/public.key -pubout -outform PEM
   chmod 600 $KEYDIR/private.key
+  chown opendkim $KEYDIR/private.key
 }
 
 [ -f $KEYDIR/keytable ] || cat > $KEYDIR/keytable <<EOF
