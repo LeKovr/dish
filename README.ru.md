@@ -6,8 +6,8 @@ DISH
 Подготовка
 ----------
 
-Установить [docker](http://www.docker.io/gettingstarted/)
-Установить dish
+* Установить [docker](http://www.docker.io/gettingstarted/)
+* Установить dish
 ```
 git clone git@github.com:LeKovr/dish.git
 
@@ -49,12 +49,14 @@ export DISHROOT=$PWD/dish
 
 #### Сервер в облаке
 
-    # обновим пакеты
-    cat /home/app/charm/update | bash
+```
+# обновим пакеты
+curl -s https://github.com/LeKovr/dish/raw/master/charm/update | bash
 
-    # установим ssh
-    cat /home/app/charm/ssh | bash
+# установим ssh
+curl -s https://github.com/LeKovr/dish/raw/master/charm/ssh | bash
 
-    # создадим пользователя (op)
-    cat /home/app/charm/user | bash
+# создадим пользователя (op)
+curl -s https://github.com/LeKovr/dish/raw/master/charm/user | bash
+```
 
