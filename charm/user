@@ -29,6 +29,7 @@ grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gww
     echo "WARNING: ssh key not found"
   fi
   [ "$KEY" ] && {
+    echo "Using pub key $KEY"
     cat $KEY | head -1 > $HOMEDIR/.ssh/authorized_keys
     chown $NEWUSER $HOMEDIR/.ssh/authorized_keys
     chmod 600 $HOMEDIR/.ssh/authorized_keys

@@ -51,12 +51,12 @@ export DISHROOT=$PWD/dish
 
 ```
 # обновим пакеты
-curl -s https://github.com/LeKovr/dish/raw/master/charm/update | bash
+curl -s https://raw.githubusercontent.com/LeKovr/dish/master/charm/update | bash
 
 # установим ssh
-curl -s https://github.com/LeKovr/dish/raw/master/charm/ssh | bash
+curl -s https://raw.githubusercontent.com/LeKovr/dish/master/charm/ssh | bash
 
 # создадим пользователя (op)
-curl -s https://github.com/LeKovr/dish/raw/master/charm/user | bash
+curl -s https://raw.githubusercontent.com/LeKovr/dish/master/charm/user | bash
 ```
 
