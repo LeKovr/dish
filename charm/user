@@ -14,6 +14,7 @@ KEY0=~/.ssh/authorized_keys
 KEY1=/home/app/op/.ssh/authorized_keys
 
 HOMEDIR=/home/app/$NEWUSER
+[ -d /home/app ] || mkdir /home/app
 
 # Check if user exists already
 grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gwww-data -gusers $NEWUSER
