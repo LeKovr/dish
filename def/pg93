@@ -4,23 +4,6 @@
 # Usage: 
 #  dish build pg93:01 lekovr/base:1204.01
 
-# use apt-cache-ng from host system
-#apt-cacher
-
-# update apt package list and ubuntu packages
-#update
-
-# setup utf8 locale
-#language ru
-
-# we will use midnight commander 
-#mc # boot
-
-# create user "op" inside container
-#user op
-
-# supervisord
-server boot
 
 # we will connect to container via ssh
 ssh
