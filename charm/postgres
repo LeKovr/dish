@@ -6,8 +6,6 @@
 V=$1
 [[ "$V" != "--" ]] || V=9.1
 
-require server
-
 if [[ "$V" == "9.2" ]] ; then
   add-apt-repository -y ppa:pitti/postgresql
   apt-get update
@@ -42,15 +40,7 @@ sudo -u postgres psql -c "create user apache password 'apache'" template1
 
 /etc/init.d/postgresql stop
 
-cat >> /etc/supervisor/conf.d/postgresql-$V.conf <<EOF
-[program:postgresql-$V]
-command=/usr/lib/postgresql/$V/bin/postgres -D /var/lib/postgresql/$V/main -c config_file=/etc/postgresql/$V/main/postgresql.conf
-user=postgres
-autorestart=true
-stopsignal=INT
-redirect_stderr=true
-EOF
-
 # EXPOSE 5432
 add_port 5432
 
+add_service postgresql

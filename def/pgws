@@ -7,8 +7,6 @@
 # 12.10 is used because 12.04 has only Template version 2.22
 # Template version 2.24 required--this is only version 2.22
 
-# supervisord
-server boot
 
 # we will connect to container via ssh
 ssh

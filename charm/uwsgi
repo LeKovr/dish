@@ -1,6 +1,8 @@
 
 # http://projects.unbit.it/downloads/uwsgi-VERSION.tar.gz
 
+require supervisor
+
 apt-get install -y build-essential python \
   libperl-dev libcoro-perl \
   libxml2-dev libpcre3-dev libcap2-dev \

@@ -1,0 +1,17 @@
+# setup supervisor
+
+# Disallow shell questions
+export DEBIAN_FRONTEND=noninteractive
+
+
+apt-get install -y supervisor || exit 1
+
+#/etc/init.d/supervisor stop
+
+#cat >> /etc/supervisor/supervisord.conf <<EOF
+#[supervisord]
+#nodaemon=true
+#EOF
+
+add_service supervisor
+

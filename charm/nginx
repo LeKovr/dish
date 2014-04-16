@@ -1,8 +1,6 @@
 # -------------------------------------------------------------------------------
 # nginx
 
-require server
-
 apt-get -y install nginx-extras
 
 [ -f /etc/nginx/conf.d/log_main.conf ] || {
@@ -17,14 +15,7 @@ EOF
   echo "upload_progress proxied 1m;" > /etc/nginx/conf.d/proxied.conf
 }
 
-echo "daemon off;" >> /etc/nginx/nginx.conf
-
-[ -f /etc/supervisor/conf.d/nginx.conf] || cat >> /etc/supervisor/conf.d/nginx.conf <<EOF
-[program:nginx]
-command=/usr/sbin/nginx
-stdout_events_enabled=true
-stderr_events_enabled=true
-EOF
+add_service nginx
 
 # EXPOSE 80
 add_port 80
