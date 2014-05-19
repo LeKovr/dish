@@ -36,10 +36,17 @@ EOF
 
   echo 'force-unsafe-io' | tee /etc/dpkg/dpkg.cfg.d/02apt-speedup
 
-else
+elif grep -q 12.10 /etc/lsb-release ; then
   # See: https://github.com/dotcloud/docker/issues/1024
   dpkg-divert --local --rename --add /sbin/initctl
   ln -s /bin/true /sbin/initctl
   sed -i.bak 's/main$/main universe/' /etc/apt/sources.list
 fi
 
+
+
+# Setup timezone like host
+[[ "$TZ" ]] && {
+  echo $TZ > /etc/timezone
+  cp /usr/share/zoneinfo/$TZ /etc/localtime
+}
