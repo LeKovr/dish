@@ -23,6 +23,7 @@ dish_help() {
 EOF
 }
 
+DOCKER=$(which docker.io) || DOCKER=$(which docker)
 # ------------------------------------------------------------------------------
 
 # Run image build script
@@ -50,13 +51,14 @@ dish_build() {
   local base=$1
   [ "$base" ] || base="$BASE_IMAGE:$BASE_TAG"
   echo "Using base image $base"
-
-  sudo docker run -i \
+  local timez=$(cat /etc/timezone)
+  sudo $DOCKER run -i \
     -v $PWD:$APP_ROOT \
     -w $APP_ROOT \
-    -dns $DNS \
-    -cidfile=$cid_file \
+    --dns $DNS \
+    --cidfile=$cid_file \
     -e LC1=$LANGUAGE \
+    -e TZ=$timez \
     -e BASE_IMAGE=$base \
     --entrypoint="/bin/bash" \
     $base build.dish $def $prefix $CONT_CMD || { echo "Build failed. Exiting." ; exit 1 ; }
@@ -68,7 +70,7 @@ dish_build() {
 
   local cid=$(cat $cid_file)
   echo "Wait for docker stop"
-  rv=$(sudo docker wait $cid)
+  rv=$(sudo $DOCKER wait $cid)
   [[ "$rv" == "0" ]] || { echo "Build stop failed. Exiting." ; exit ; }
 
   local entry="/di.sh"
@@ -89,10 +91,10 @@ dish_build() {
 
   [[ "$rel" ]] || rel=latest
   echo "commit of $cid with $def:$rel, cmd $@ "
-  cid=$(sudo docker commit -author="$MAINTAINER" \
-    -run="{\"Hostname\" : \"$def\", \"Entrypoint\" : [\"$entry\"], \"WorkingDir\" : \"$APP_ROOT\"$ports}" \
+  cid=$(sudo $DOCKER commit --author="$MAINTAINER" \
+    --run="{\"Hostname\" : \"$def\", \"Entrypoint\" : [\"$entry\"], \"WorkingDir\" : \"$APP_ROOT\"$ports}" \
     $cid $TAGPREFIX/$def:$rel)
-  [[ "$rel" == "latest" ]] || sudo docker tag -f $cid $TAGPREFIX/$def
+  [[ "$rel" == "latest" ]] || sudo $DOCKER tag -f $cid $TAGPREFIX/$def
 
   echo "Prefix: $prefix"
   rm -f $prefix.*
@@ -110,10 +112,10 @@ dish_run() {
   local rel=${tag#*:} # remove def
   [[ "$def" == "$rel" ]] && rel=""
   [[ "$rel" ]] && rel="-${rel/./_}"
-  sudo docker run -i -t \
+  sudo $DOCKER run -i -t \
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
-    -dns $DNS \
+    --dns $DNS \
     $@ $TAGPREFIX/$tag
 }
 
@@ -127,10 +129,10 @@ dish_rund() {
   local rel=${tag#*:} # remove def
   [[ "$def" == "$rel" ]] && rel=""
   [[ "$rel" ]] && rel="-${rel/./_}"
-  sudo docker run -d \
+  sudo $DOCKER run -d \
     -h "$def$rel" \
     -v $PWD:$APP_ROOT \
-    -dns $DNS \
+    --dns $DNS \
     -e DISHMODE=bg \
     $@ $TAGPREFIX/$tag
 }
