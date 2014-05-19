@@ -17,7 +17,7 @@ HOMEDIR=/home/app/$NEWUSER
 [ -d /home/app ] || mkdir /home/app
 
 # Check if user exists already
-grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gwww-data -gusers $NEWUSER
+grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gwww-data -gusers -gsudo $NEWUSER
 
 [ -d $HOMEDIR/.ssh ] ||  sudo -u $NEWUSER mkdir -m 700 $HOMEDIR/.ssh
 
@@ -38,10 +38,11 @@ grep -qe "^$NEWUSER:" /etc/passwd || useradd -d $HOMEDIR -m -r -s /bin/bash -Gww
   }
 }
 
-[ -f /etc/sudoers.d/$NEWUSER ] || {
-  echo "$NEWUSER ALL=NOPASSWD:ALL" > /etc/sudoers.d/$NEWUSER
-  chmod 440 /etc/sudoers.d/$NEWUSER
-}
+# user op added in group sudo instead this:
+#[ -f /etc/sudoers.d/$NEWUSER ] || {
+#  echo "$NEWUSER ALL=NOPASSWD:ALL" > /etc/sudoers.d/$NEWUSER
+#  chmod 440 /etc/sudoers.d/$NEWUSER
+#}
 
 
 cat <<EOF
