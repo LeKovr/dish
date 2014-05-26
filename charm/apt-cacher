@@ -9,6 +9,10 @@
 
 GW=$1
 
+# check if nc available
+which nc > /dev/null ; RV=$?
+[[ "$RV" == "0" ]] || apt-get install -y netcat-openbsd
+
 # get gw ip
 # http://serverfault.com/questions/31170/how-to-find-the-gateway-ip-address-in-linux
 [[ "$GW" != "--" ]] || GW=$(ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3)

@@ -50,3 +50,8 @@ fi
   echo $TZ > /etc/timezone
   cp /usr/share/zoneinfo/$TZ /etc/localtime
 }
+
+# check if sudo available
+which sudo > /dev/null ; RV=$?
+[[ "$RV" == "0" ]] || apt-get install -y sudo
+
