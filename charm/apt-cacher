@@ -9,21 +9,18 @@
 
 GW=$1
 
-# check if nc available
-which nc > /dev/null ; RV=$?
-[[ "$RV" == "0" ]] || apt-get install -y netcat-openbsd
-
 # get gw ip
 # http://serverfault.com/questions/31170/how-to-find-the-gateway-ip-address-in-linux
 [[ "$GW" != "--" ]] || GW=$(ip route show 0.0.0.0/0 dev eth0 | cut -d\  -f3)
 
+echo "Checking apt-cacher-ng on $GW port 3142..."
 # set to 0 if port is open
-#noport=$(nc 127.0.0.1 3142 < /dev/null; echo $?)
-noport=$(nc $GW 3142 < /dev/null; echo $?)
+noport=$(perl -E "use Socket; socket(SOCKET,PF_INET,SOCK_STREAM,(getprotobyname('tcp'))[2]); \
+ connect( SOCKET, pack_sockaddr_in(3142, inet_aton('$GW'))) or die 'no connection'; 1;" && echo $?)
 
 if [[ "$noport" == "0" ]] ; then
   # we have apt-cacher
-  echo "Build charm apt-proxy for $GW:3142"
+  echo "Enabling apt-cacher-ng"
   echo "Acquire::http { Proxy \"http://$GW:3142\"; };" > /etc/apt/apt.conf.d/02proxy
 else
   echo "WARNING: apt-cacher requested but not reachable. Skipping config"

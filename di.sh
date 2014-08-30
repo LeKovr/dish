@@ -57,7 +57,7 @@ dish_build() {
     -w $APP_ROOT \
     --dns $DNS \
     --cidfile=$cid_file \
-    -e LC1=$LANGUAGE \
+    -e LC1=$LANG \
     -e TZ=$timez \
     -e BASE_IMAGE=$base \
     --entrypoint="/bin/bash" \
