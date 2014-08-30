@@ -1,0 +1,16 @@
+
+L=$1
+
+# Host system vars
+# LC1=$LANGUAGE
+
+[[ "$L" != "--" ]] || L=$LC1
+
+apt-get install -y locales
+
+sed -i "s/# $L UTF-8/$L UTF-8/" /etc/locale.gen
+sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+
+locale-gen
+update-locale LANG=$L
+
